@@ -1,6 +1,6 @@
 "use client"
 
-import { useImperativeHandle, useLayoutEffect, useRef, useSyncExternalStore } from "react"
+import { useImperativeHandle, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react"
 import { ArrowUpIcon, LoaderCircleIcon, MicIcon, SquareIcon, XIcon } from "lucide-react"
 import { expectMicrophone } from "@/lib/audio-session"
 import { useDictation } from "@/hooks/use-dictation"
@@ -49,6 +49,12 @@ export function Composer({ ready, online, busy, speech, submit, stop, handle, re
    * true for the callback that has already been asked for.
    */
   const reviewing = useRef(false)
+  /**
+   * The same answer, for the screen: the spinner belongs on the button that was
+   * pressed. It used to sit on the send button whichever way the recording
+   * ended, which after pressing stop read as a send in progress.
+   */
+  const [endedBy, setEndedBy] = useState<"review" | "send" | null>(null)
   const dictation = useDictation({
     statusChanged: recordingChanged,
     completed: (text) => {
@@ -64,6 +70,8 @@ export function Composer({ ready, online, busy, speech, submit, stop, handle, re
     failed: (message, text) => { reviewing.current = false; restore(text); reportError(message) },
   })
   const listening = dictation.status !== "idle"
+  const finishing = dictation.status === "finishing"
+  const spinner = <LoaderCircleIcon size={18} className="animate-spin" aria-hidden="true" />
   function startRecording() {
     if (!speech || !online || !ready || listening) return false
     stop()
@@ -78,6 +86,7 @@ export function Composer({ ready, online, busy, speech, submit, stop, handle, re
   /** One recorder, two ways to end it: to the room, or to the field. */
   function finish(review: boolean) {
     reviewing.current = review
+    setEndedBy(review ? "review" : "send")
     dictation.finish()
   }
   function discard() {
@@ -129,8 +138,8 @@ export function Composer({ ready, online, busy, speech, submit, stop, handle, re
             {/* The middle of three, and the one that was missing: it ends the
                 recording and puts the words in the field instead of in front of
                 the agents, so a sentence can be read before it is spent. */}
-            <button type="button" className="icon-button" onClick={() => finish(true)} disabled={dictation.status !== "listening"} aria-label="Stop and review" title="Stop without sending"><SquareIcon size={15} /></button>
-            <button type="button" className="send-button" onClick={() => finish(false)} disabled={dictation.status !== "listening"} aria-label={dictation.status === "finishing" ? "Finishing transcription" : "Send recording"}>{dictation.status === "finishing" ? <LoaderCircleIcon size={20} className="animate-spin" /> : <ArrowUpIcon size={20} />}</button>
+            <button type="button" className="icon-button" onClick={() => finish(true)} disabled={dictation.status !== "listening"} aria-label={finishing && endedBy === "review" ? "Finishing transcription" : "Stop and review"} title="Stop without sending">{finishing && endedBy === "review" ? spinner : <SquareIcon size={15} />}</button>
+            <button type="button" className="send-button" onClick={() => finish(false)} disabled={dictation.status !== "listening"} aria-label={finishing && endedBy === "send" ? "Finishing transcription" : "Send recording"}>{finishing && endedBy === "send" ? spinner : <ArrowUpIcon size={20} />}</button>
           </>
         ) : (
           <>
