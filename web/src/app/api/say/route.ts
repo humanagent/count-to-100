@@ -6,7 +6,16 @@ import { ensureRoom } from "@/lib/room-session"
 import type { RoomEvent } from "@/lib/room-stream"
 
 export const dynamic = "force-dynamic"
-export const maxDuration = 300
+export const maxDuration = 600
+
+// How long one prompt may keep the room talking. Three agents counting take
+// about 3.3s a number — one reply plus the two quiet turns beside it — so a
+// count to 100 is five and a half minutes before a provider retry or a
+// background memory review adds its own. The old 240s ceiling cut one off at
+// seventy-three, to the second. Ten minutes fits the count with room for the
+// hiccups; the ceiling still exists so a round that never goes quiet cannot
+// hold the room forever.
+const ROUND_BUDGET_MS = 600_000
 
 export async function POST(request: Request) {
   const group = agents()
@@ -27,7 +36,7 @@ export async function POST(request: Request) {
   const release = acquireRoom()
   if (!release) return Response.json({ error: "The room is responding. Try again when it finishes." }, { status: 409 })
   const cancel = new AbortController()
-  const signal = AbortSignal.any([request.signal, cancel.signal, AbortSignal.timeout(240_000)])
+  const signal = AbortSignal.any([request.signal, cancel.signal, AbortSignal.timeout(ROUND_BUDGET_MS)])
   const encoder = new TextEncoder()
   let closed = false
   const stream = new ReadableStream<Uint8Array>({

@@ -31,13 +31,17 @@ export async function runRoomRound({ group, message, speaker = UNNAMED, signal, 
       const settled = await Promise.allSettled(audienceFor(group, line.speaker).map(async (agent) => {
         emit({ type: "thinking", agent: agent.name })
         const reply = await deliver(agent, ROOM, line.speaker, line.text, signal)
+        // Signed here, at the one place a reply becomes something the room
+        // has said. The browser hands this back to ask for the voice.
+        //
+        // Before the abort check, not after: a reply that came back is
+        // already in that agent's history. If the round ends here, the room
+        // still hears it — otherwise that agent and everyone else disagree
+        // about where the conversation left off.
+        if (reply.spoke) emit({ type: "said", agent: agent.name, text: reply.text, audio: reply.audio, grant: grantFor(agent.name, reply.text) })
         signal.throwIfAborted()
-        if (reply.spoke) {
-          // Signed here, at the one place a reply becomes something the room
-          // has said. The browser hands this back to ask for the voice.
-          emit({ type: "said", agent: agent.name, text: reply.text, audio: reply.audio, grant: grantFor(agent.name, reply.text) })
-          next.push({ speaker: agent.name, text: reply.text })
-        } else if (reply.error) {
+        if (reply.spoke) next.push({ speaker: agent.name, text: reply.text })
+        else if (reply.error) {
           failed = true
           emit({ type: "failed", agent: agent.name, error: "Agent unavailable" })
         } else emit({ type: "quiet", agent: agent.name })
