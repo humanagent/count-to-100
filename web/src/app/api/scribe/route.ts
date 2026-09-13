@@ -1,0 +1,101 @@
+import { ElevenLabsError } from "@elevenlabs/elevenlabs-js"
+
+import { spendSession } from "@/lib/budget"
+import { client, key, LISTEN_GATE, speechOff, TTS_LANGUAGE } from "@/lib/elevenlabs"
+import { caller, limiter } from "@/lib/rate-limit"
+import { sameOrigin } from "@/lib/same-origin"
+
+export const dynamic = "force-dynamic"
+
+/**
+ * What one browser, and all of them, may open.
+ *
+ * A person records a few times a minute at most, and each token is one session.
+ * A stranger who could mint them freely would be handing themselves live
+ * transcription on this account, which is why the cheap checks below run before
+ * anything reaches ElevenLabs.
+ */
+const tokenLimit = () => limiter("scribe", { perMinute: 10, burst: 5 }, { perMinute: 60, burst: 20 })
+
+/**
+ * A single-use token for realtime transcription.
+ *
+ * The key never reaches the browser: ElevenLabs mints a token good for one
+ * session and nothing else, which is the whole reason this endpoint exists
+ * rather than the page holding the key itself.
+ *
+ * A token is still worth something to a stranger, so it is rationed and refused
+ * outright to a page that is not this one.
+ */
+export async function POST(request: Request) {
+  const suppliedId = request.headers.get("x-request-id")
+  const requestId = suppliedId && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(suppliedId)
+    ? suppliedId : crypto.randomUUID()
+  const started = performance.now()
+  const headers = { "Cache-Control": "no-store", "X-Request-ID": requestId }
+  let outcome = "unavailable"
+  let upstreamStatus: number | undefined
+  let upstreamRequestId: string | undefined
+  try {
+    const apiKey = key()
+    if (!apiKey || speechOff()) {
+      outcome = "not_configured"
+      return Response.json({ error: "Voice is not configured." }, { status: 503, headers })
+    }
+    if (!sameOrigin(request)) {
+      outcome = "cross_origin"
+      return Response.json({ error: "Use this site's microphone." }, { status: 403, headers })
+    }
+    const allowed = tokenLimit().take(caller(request))
+    if (!allowed.ok) {
+      outcome = "rate_limited"
+      return Response.json({ error: "Too many recordings just now. Try again shortly." }, {
+        status: 429, headers: { ...headers, "Retry-After": String(allowed.retryAfter) },
+      })
+    }
+    // A token becomes a transcription session, and a session is the unit this
+    // is billed in. Taken before minting, so the month cannot be spent by
+    // tokens that were handed out and then used.
+    const month = spendSession()
+    if (!month.ok) {
+      outcome = "budget_spent"
+      return Response.json({ error: "This room has listened its fill for the month." }, { status: 503, headers })
+    }
+    // `realtime_scribe` is the SDK's own constant for this token type. The
+    // string it stands for was worth a bug report once: the UI registry shipped
+    // `scribe_realtime_v2` as a model id, the socket opened and the server
+    // closed it, and it read as a broken microphone rather than a bad
+    // parameter. A name the compiler checks cannot be misspelled that way.
+    const minted = await client(apiKey).tokens.singleUse.create("realtime_scribe", {
+      maxRetries: 1, timeoutInSeconds: 10, abortSignal: request.signal,
+    })
+    if (!minted.token) {
+      outcome = "invalid_response"
+      return Response.json({ error: "Transcription service unavailable." }, { status: 502, headers })
+    }
+    outcome = "ready"
+    // The language travels with the token rather than through four components
+    // of props: the server owns the decision, and this is the one request the
+    // browser already makes before it opens a microphone. Absent when the room
+    // is letting each session be detected, which is its default.
+    return Response.json({
+      token: minted.token,
+      ...(TTS_LANGUAGE ? { language: TTS_LANGUAGE } : {}),
+      ...(LISTEN_GATE > 0 ? { gate: LISTEN_GATE } : {}),
+    }, { headers })
+  } catch (failure) {
+    // The provider's status when it answered, and nothing it said. A body can
+    // carry back what was submitted; a status and a request id cannot.
+    if (failure instanceof ElevenLabsError) {
+      upstreamStatus = failure.statusCode
+      upstreamRequestId = failure.requestId
+      outcome = "provider_error"
+    } else {
+      outcome = request.signal.aborted ? "cancelled" : "network_error"
+    }
+    return Response.json({ error: "Transcription service unavailable." }, { status: 502, headers })
+  } finally {
+    // Never log the provider body, credentials, token, request URL or error stack.
+    console.info(JSON.stringify({ event: "speech.token", version: 1, requestId, outcome, upstreamStatus, upstreamRequestId, durationMs: Math.round(performance.now() - started) }))
+  }
+}

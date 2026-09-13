@@ -1,0 +1,440 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-ui);
+  --font-heading: var(--font-ui);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* The instrumentation voice. Genuinely neutral rather than a chosen one:
+     state labels and controls should not compete with what is being said. */
+  --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+  /* Tailwind v4 dropped the pointer from buttons, so every clickable thing in
+     here looked like text. Anything you can actually press says so. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  a[href] {
+    @apply cursor-pointer;
+  }
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
+}
+
+/* The room: quiet surfaces, luminous people, and motion with a clear purpose. */
+.dark {
+  --background: #101116;
+  --foreground: #eeedf3;
+  --card: #17181f;
+  --muted-foreground: #a5a4b4;
+  --border: #ffffff12;
+  --primary: #d8cafa;
+  --primary-foreground: #251e32;
+  --secondary: #25232e;
+  --ring: #c3afe8;
+}
+html { color-scheme: dark; background: #17181f; --room-rest-height: 100dvh; --room-safe-bottom: env(safe-area-inset-bottom, 0px); --room-safe-top: env(safe-area-inset-top, 0px); }
+body { margin: 0; background: #17181f; }
+/* Lock only chat routes: the transcript scrolls, never the document behind it.
+   Absolute placement inside the fixed body follows iOS's visual viewport pan. */
+/* THE 62px WINDOW. Read this before touching the height of html or body.
+
+   The root and body take the rest height, never 100%. In the installed app
+   WebKit's initial containing block is the screen minus the status bar, so a
+   100% document came out 62px short on an iPhone 17 Pro (874 - 812), and
+   about a second after every launch WebKit shrank the window itself to match
+   that document: innerHeight 874 -> 812, anchored to the top of the screen,
+   with the bottom 62px painted in the body colour and nothing of ours in it.
+   The composer, sitting at the foot of a 100vh page, was cut off above it.
+
+   This was far harder to find than it should have been, and it cost an
+   afternoon and four wrong fixes. Every scroll and viewport offset read zero,
+   because nothing was panned; the keyboard was blamed because the strip was
+   first noticed after typing, but the log showed it appearing with no input
+   focused. Scroll resets, sizing the page to the measured window (which put
+   the composer 62px too high instead), the documented "heal" of toggling a
+   full-height element's display, and re-setting the viewport meta all did
+   nothing, since none of them changed the document's height. Force-quitting
+   did not help either: the shrink is per launch, not per keyboard.
+
+   What found it: colouring html, body, page, shell and footer differently,
+   a fixed overlay printing innerHeight, screen, visualViewport, safe-area env
+   values and element rects, POSTed to the dev log, and full simulator
+   screenshots. The band was the body's colour outside every element, the
+   document was 812 tall while the screen was 874, and setting html and body
+   to 100vh restored the window in one hot reload. Check the parents first.
+
+   A document as tall as the screen keeps the window as tall as the screen.
+   The keyboard hook still switches this to the visual viewport height while
+   a keyboard is up; that path was never the problem. */
+html[data-room-viewport="true"], html[data-room-viewport="true"] body { height: var(--room-rest-height, 100%); overflow: hidden; overscroll-behavior: none; }
+html[data-room-viewport="true"] body { position: fixed; inset: 0; background: #17181f; }
+html[data-room-viewport="true"] .room-page { position: absolute; top: var(--room-viewport-top, 0px); left: 0; right: 0; }
+/* Standalone has no retracting browser toolbar. WebKit's dynamic/percentage
+   heights can exclude safe areas here, leaving an extra strip below the app.
+   Keep the full surface; apply the home-indicator inset once, in the footer. */
+/* Both selectors, because the media query is true from the first paint while
+   the attribute arrives with hydration: the app must fit before any script. */
+@media (display-mode: standalone) {
+  html { --room-rest-height: 100vh; }
+  .room-page { padding: 0; }
+  .room-shell { width: 100%; border: 0; border-radius: 0; box-shadow: none; padding: var(--room-safe-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
+  .composer-wrap { padding-bottom: max(8px, calc(var(--room-safe-bottom) - var(--room-keyboard-inset, 0px))); }
+}
+html[data-room-standalone="true"] { --room-rest-height: 100vh; }
+html[data-room-standalone="true"] .room-page { padding: 0; }
+html[data-room-standalone="true"] .room-shell { width: 100%; border: 0; border-radius: 0; box-shadow: none; padding: var(--room-safe-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
+button, a, textarea { -webkit-tap-highlight-color: transparent; }
+/* Every element carries its own touch-action. WebKit resets the effective
+   value at each scroll container (the transcript, notices, the textarea), so a
+   rule on html never reaches a tap inside them and double-tap still zoomed.
+   The browser keeps pinch for accessibility; the installed app allows panning only. */
+* { touch-action: manipulation; }
+@media (display-mode: standalone) { * { touch-action: pan-x pan-y; } }
+html[data-room-standalone="true"] * { touch-action: pan-x pan-y; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+button { transition: color 180ms, background-color 180ms, opacity 180ms, transform 180ms; }
+button:active:not(:disabled) { transform: scale(.96); }
+button:disabled { opacity: .35; }
+.room-page { height: var(--room-viewport-height, var(--room-rest-height, 100dvh)); min-height: 0; max-width: 1320px; margin: auto; padding: 28px 48px 18px; display: flex; flex-direction: column; background: radial-gradient(ellipse at 50% 36%, #7261870d, transparent 64%); }
+.room-shell { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 0; width: min(100%, 880px); margin: 0 auto; border: 1px solid #ffffff12; border-radius: 28px; background: #17181f; box-shadow: 0 28px 100px #00000030, 0 1px 0 #ffffff04 inset; overflow: hidden; }
+.room-header { flex-shrink: 0; min-height: 72px; padding: 26px 32px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.room-header h1 { font-size: 20px; line-height: 1.25; font-weight: 450; letter-spacing: -.5px; }
+.room-header > div { min-width: 0; }
+.room-status { color: #aaa7b6; font-size: 11px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The title is the field. The input carries the header's own type so editing
+   happens over the title rather than inside a control that appeared on top of
+   it, and the negative margin pays back its padding so the glyphs stay on the
+   header's left edge with the status line beneath them. */
+/* The target is the whole title, tail included, because the title is the field.
+   Tinting only the name put the tint's edge under the apostrophe, and a
+   possessive cannot be moved off its noun to make room for a hover state. */
+/* The tint is drawn by an out-of-flow pseudo-element, and the title itself has
+   no padding at all. Padding plus a negative margin to pay it back is the usual
+   trick and it cost the name 14px twice: the negative margin cancels the padding
+   in the intrinsic width, so the field — the only thing here that can shrink —
+   absorbed the difference and clipped the name. Nothing that only draws should
+   be able to take space away from what it draws around. */
+.room-title { position: relative; display: inline-flex; align-items: baseline; min-width: 0; max-width: 100%; cursor: text; }
+.room-title::before { content: ""; position: absolute; inset: -3px -7px; border-radius: 9px; transition: background-color 140ms ease; }
+.room-title:hover::before { background: #ffffff08; }
+.room-title:focus-within::before { background: #ffffff0e; outline: 1px solid #d0b8ef59; }
+/* Positioned, so the words paint above the surface drawn behind them. */
+.room-name-field, .room-title-tail { position: relative; }
+/* Shrinks to fit the header, never to nothing: a title reading "’s room" with
+   the name gone is worse than one ending in an ellipsis. Three characters is
+   the floor, which is what the narrowest phone leaves a long name. */
+.room-name-field { flex: 0 1 auto; min-width: 3ch; }
+/* The name you read is this span: it can end in an ellipsis when the room is
+   too narrow for it, which an input cannot do, and it is what gives the field
+   its width. The input lies exactly over it and takes the ink only while it is
+   being typed in, so the swap has no frame to get wrong. */
+.room-name-shown { display: block; overflow: hidden; white-space: pre; text-overflow: ellipsis; font: inherit; letter-spacing: inherit; }
+.room-name-empty { color: #8d88a0; }
+.room-name { position: absolute; inset: 0; width: 100%; font: inherit; letter-spacing: inherit; color: transparent; background: transparent; border: 0; outline: 0; }
+.room-name::placeholder { color: transparent; }
+.room-title:focus-within .room-name { color: inherit; }
+.room-title:focus-within .room-name::placeholder { color: #8d88a0; }
+.room-title:focus-within .room-name-shown { visibility: hidden; }
+/* The twin is what has a size. It holds the same string in the same type and
+   stays in the flow, so the field is exactly as wide as the name and the input
+   lies over it — no measuring, and no first paint at the wrong width. */
+.room-title-tail { flex: 0 0 auto; color: #aaa7b6; }
+.room-name-problem { color: #d5c9e2; font-size: 11px; margin-top: 6px; }
+.room-actions { display: flex; gap: 2px; }
+.icon-button { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; flex-shrink: 0; color: #aaa7b8; border-radius: 12px; }
+.icon-button:hover:not(:disabled) { background: #ffffff08; color: #f4eefc; }
+.stage-wrap { flex: 0 0 auto; padding: 14px 28px 20px; border-bottom: 1px solid #ffffff0a; background: radial-gradient(ellipse at 50% 44%, #9d89b10b, transparent 65%); }
+.agent-stage { display: flex; justify-content: center; gap: clamp(20px, 5vw, 66px); padding: 16px 0 15px; overflow-x: auto; scrollbar-width: thin; }
+.agent { flex-shrink: 0; width: 104px; text-align: center; }
+.agent-orbit { position: relative; width: 88px; height: 88px; margin: 0 auto 18px; }
+.agent-sphere { position: absolute; inset: 6px; transition: transform 650ms cubic-bezier(.22, 1, .36, 1); animation: orb-float 7s ease-in-out infinite; animation-delay: inherit; }
+.agent:nth-child(2) .agent-sphere { animation-delay: -2.3s; }
+.agent:nth-child(3) .agent-sphere { animation-delay: -4.6s; }
+.agent-halo { position: absolute; inset: -1px; border: 1px solid #d0b8ef00; border-radius: 50%; transition: border-color 450ms, opacity 450ms, transform 650ms; opacity: 0; }
+.agent[data-phase="speaking"] .agent-halo { border-color: #d0b8ef55; opacity: 1; transform: scale(1.14); }
+.agent[data-phase="speaking"] .agent-sphere { scale: 1.1; }
+.agent[data-phase="thinking"] .agent-halo { border: 1px dashed #d0b8ef55; opacity: .7; animation: orb-rotate 16s linear infinite; }
+.agent[data-phase="unreachable"] .agent-sphere { opacity: .4; }
+.agent-name { display: block; font-size: 13px; font-weight: 500; letter-spacing: -.1px; }
+.agent-caption { height: 20px; display: flex; justify-content: center; gap: 5px; align-items: center; font-size: 10px; color: #a5a0b2; margin-top: 3px; }
+.agent[data-phase="speaking"] .agent-caption { color: #d9c4f5; }
+.soft-orb { display: block; position: relative; border-radius: 50%; overflow: hidden; isolation: isolate; background: radial-gradient(circle at 30% 22%, var(--orb-light), var(--orb-color) 28%, var(--orb-deep) 70%); box-shadow: inset 0 0 0 1px #ffffff25, inset -8px -8px 16px #11122250, 0 8px 24px #00000025; }
+.orb-cloud { position: absolute; inset: -22%; border-radius: 42%; background: conic-gradient(from 20deg, transparent 10%, var(--orb-deep) 23%, var(--orb-light) 42%, transparent 57%, var(--orb-color) 75%, var(--orb-light) 87%, transparent); opacity: .65; animation: orb-rotate var(--orb-duration) linear infinite; animation-delay: var(--orb-delay); }
+.orb-gloss { position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(ellipse at 29% 20%, #ffffff88, #ffffff08 28%, transparent 50%), radial-gradient(ellipse at 70% 80%, transparent 30%, #08091155 100%); box-shadow: inset 0 0 1px 1px #ffffff29; }
+.orb-still .orb-cloud { animation: none; }
+.voice-bars { display: inline-flex; align-items: center; gap: 2px; height: 12px; }
+.voice-bars i { width: 2px; height: 9px; background: #ceb4ec; border-radius: 2px; animation: voice-bar .8s ease-in-out infinite alternate; }
+.voice-bars i:nth-child(2) { animation-delay: -.3s; }
+.voice-bars i:nth-child(3) { animation-delay: -.6s; }
+/* Only the inner transcript scrolls. Clip its paint/scroll controls to this
+   region so a promoted scrolling layer cannot cover the composer at the end. */
+.room-conversation { min-height: 0; flex: 1 1 0%; overflow: hidden; isolation: isolate; overscroll-behavior: contain; }
+.room-conversation > div { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #ffffff20 transparent; overscroll-behavior: contain; }
+.transcript-content { display: flex; flex-direction: column; min-height: 100%; padding: 22px 32px 16px; gap: 17px; }
+.room-empty { margin: auto 0; text-align: center; padding: 18px 12px 24px; font-size: 12px; color: #aaa6b5; }
+.chat-message { display: flex; align-items: flex-start; gap: 10px; flex-shrink: 0; }
+.message-avatar { width: 26px; height: 26px; margin-top: 22px; flex-shrink: 0; }
+.message-body { max-width: min(85%, 600px); min-width: 0; }
+.message-meta { display: flex; align-items: center; gap: 9px; color: #bcb5c9; font-size: 10px; margin: 0 2px 6px; }
+.spoken-label { display: inline-flex; align-items: center; gap: 4px; color: #a49cab; font-size: 9px; }
+.message-bubble { border: 1px solid #ffffff0b; border-radius: 3px 17px 17px 17px; padding: 12px 16px; background: #21212b; font-size: 13px; line-height: 1.7; color: #e0dce7; overflow-wrap: anywhere; transition: border-color 400ms; }
+.message-bubble[data-speaking="true"] { border-color: #b9a1d847; }
+.message-bubble pre { max-width: 100%; overflow-x: auto; }
+.message-bubble p { margin: 0; }
+.reading-ahead { color: #a09aa8; }
+.from-you { justify-content: flex-end; }
+.from-you .message-meta { justify-content: flex-end; }
+.from-you .message-bubble { border-radius: 17px 3px 17px 17px; background: #d8cafa; border-color: #e1d5fc; color: #2b2239; box-shadow: 0 3px 12px #0000000a; }
+.message-foot { min-height: 20px; padding: 5px 2px 0; display: flex; align-items: center; gap: 9px; color: #aaa1b6; font-size: 9px; }
+.from-you .message-foot { justify-content: flex-end; }
+.message-foot button { display: flex; align-items: center; gap: 4px; min-height: 24px; }
+.from-agent .message-foot button { opacity: 0; }
+.chat-message:hover .message-foot button, .chat-message:focus-within .message-foot button { opacity: 1; }
+.message-enter { animation: message-arrive 320ms cubic-bezier(.22, 1, .36, 1) both; }
+.typing-indicator { display: flex; align-items: center; gap: 10px; font-size: 10px; color: #b9aec5; padding: 2px 0 8px 36px; }
+.typing-dots { display: flex; gap: 4px; }
+.typing-dots i { height: 4px; width: 4px; border-radius: 50%; background: #c3afda; animation: status-pulse 1.3s ease-in-out infinite; }
+.typing-dots i:nth-child(2) { animation-delay: .15s; }.typing-dots i:nth-child(3) { animation-delay: .3s; }
+/* Stay in the flex layout (no overlay/spacer), above the transcript's layer. */
+.composer-wrap { position: relative; z-index: 1; flex-shrink: 0; padding: 12px 24px 15px; background: #17181f; }
+.composer { display: flex; align-items: flex-end; gap: 8px; border: 1px solid #ffffff1a; background: #202129; border-radius: 19px; padding: 9px 10px 9px 18px; box-shadow: 0 2px 8px #0000000a; transition: border-color 200ms, box-shadow 200ms; }
+.composer:focus-within { border-color: #b6a2d869; box-shadow: 0 0 0 3px #b6a2d807; }
+/* Reserve space for the persistent stage, controls and transcript; shrink a
+   long draft continuously with the keyboard instead of collapsing at 620px. */
+.composer textarea { flex: 1; min-width: 0; resize: none; padding: 8px 0; font-family: inherit; font-size: 14px; line-height: 24px; min-height: 40px; max-height: clamp(44px, calc(var(--room-viewport-height, 100dvh) - 430px), 144px); background: transparent; outline: none; color: #eeedf3; scrollbar-width: thin; }
+.composer textarea::placeholder { color: #a39bad; }
+.composer textarea { overscroll-behavior: contain; }
+.composer-buttons { display: flex; align-items: center; gap: 2px; }
+.send-button { height: 44px; width: 44px; display: flex; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 13px; background: #d8cafa; color: #2b2239; }
+.send-button:disabled { background: #393441; color: #b7a6c6; opacity: .6; }
+.send-button:hover:not(:disabled) { background: #e4d9fb; }
+.composer-hint { display: flex; justify-content: space-between; gap: 12px; min-height: 20px; margin: 10px 4px 0; font-size: 9px; color: #a29bab; line-height: 1.6; }
+.recording-content { display: flex; align-items: center; gap: 12px; min-height: 40px; min-width: 0; flex: 1; }
+.recording-icon { flex-shrink: 0; color: #dbb6fa; }
+/* Pills whose height is written each frame from the audio being sent. No
+   transition: the data is the motion, and easing on top of it would show a
+   voice that had already stopped. */
+.waveform { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; height: 26px; overflow: hidden; }
+.waveform i { flex: 0 0 2px; width: 2px; border-radius: 1px; background: #ceb4ec; }
+.recording-note { flex: 1; min-width: 0; font-size: 13px; color: #aaa7b6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-recording { border-color: #c3a8e568; }
+.room-notice { margin: 0 24px; padding: 11px 12px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: #bba0d810; border: 1px solid #bba0d820; border-radius: 10px; color: #d5c9e2; font-size: 11px; line-height: 1.6; }
+.room-notices { min-height: 0; max-height: 25%; flex: 0 1 auto; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.room-notices:empty { display: none; }
+.room-notice + .room-notice { margin-top: 6px; }.room-notice > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }.room-notice > svg { flex-shrink: 0; }.room-notice button { display: flex; align-items: center; justify-content: center; gap: 5px; flex-shrink: 0; min-height: 44px; min-width: 44px; }
+.confirm-button { background: #d8cafa; color: #2b2239; }
+.perf-panel { position: fixed; bottom: 18px; right: 18px; z-index: 50; width: min(310px, calc(100vw - 36px)); max-height: calc(100dvh - 36px); overflow-y: auto; padding: 20px; border: 1px solid #ad95cd55; border-radius: 18px; background: #191720f5; box-shadow: 0 12px 60px #0008; font-variant-numeric: tabular-nums; }.perf-panel button { padding: 4px; }.perf-toggle { position: fixed; bottom: 18px; right: 18px; z-index: 50; padding: 13px; border-radius: 50%; background: #3a2e49; }
+@keyframes orb-rotate { to { transform: rotate(360deg); } }
+@keyframes orb-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes status-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+@keyframes voice-bar { from { transform: scaleY(.3); } to { transform: scaleY(1); } }
+@keyframes message-arrive { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes surface-appear { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dialog-appear { from { opacity: 0; transform: translate(-50%, -50%) scale(.98); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+/* Short, composited entrances only. Never animate keyboard/composer geometry,
+   and never delay a dismissal waiting for a decorative animation. */
+@media (prefers-reduced-motion: no-preference) {
+  .room-dialog[open] { animation: dialog-appear 180ms cubic-bezier(.16, 1, .3, 1); }
+  .room-dialog[open]::backdrop { animation: surface-appear 180ms ease-out; }
+  .recording-content { animation: surface-appear 160ms ease-out; }
+}
+@media (hover: none) { .from-agent .message-foot button { opacity: 1; } .message-foot button { min-height: 44px; } }
+@media (max-height: 800px) and (min-width: 641px) { .room-page { padding-top: 14px; }.room-header { padding-top: 20px; }.stage-wrap { padding-top: 4px; padding-bottom: 12px; }.agent-orbit { width: 72px; height: 72px; margin-bottom: 12px; }.agent-stage { padding-top: 8px; padding-bottom: 10px; }.room-empty { padding-top: 8px; } }
+@media (max-width: 800px) { .room-page { padding-left: 24px; padding-right: 24px; } }
+@media (max-width: 640px) {
+  .room-page { padding: 0; background: #17181f; }
+  .room-shell { border: 0; border-radius: 0; width: 100%; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
+  .room-header { min-height: 64px; padding: 14px 20px 0; gap: 8px; }.room-actions { gap: 0; }
+  .room-actions { flex-shrink: 0; }
+  /* A persistent, compact mobile stage leaves room for the keyboard without
+     hiding or moving the agents when an input receives focus. */
+  .stage-wrap { padding: 4px 14px 8px; }.agent-stage { gap: 20px; padding: 4px 0; }.agent { width: 80px; }.agent-orbit { width: 56px; height: 56px; margin-bottom: 6px; }.agent-name { font-size: 12px; }.agent-caption { height: 16px; margin-top: 2px; font-size: 9px; }
+  .transcript-content { padding: 18px 18px 14px; gap: 14px; }.message-bubble { font-size: 14px; padding: 11px 14px; }.message-body { max-width: 86%; }.message-meta { font-size: 11px; }.message-avatar { width: 24px; height: 24px; }
+  .room-empty { padding: 12px 0; }
+  .composer-wrap { padding: 10px 12px max(8px, calc(var(--room-safe-bottom) - var(--room-keyboard-inset, 0px))); }.composer { padding-left: 14px; border-radius: 18px; }
+  /* Never below 16px: a smaller field is one iOS zooms the whole page into on
+     focus, and this room does not zoom. */
+  .composer textarea { font-size: 16px; }.composer-hint { font-size: 8px; margin-top: 8px; }.room-notice { margin-left: 14px; margin-right: 14px; padding: 6px 8px 6px 12px; }
+  /* Discard, stop and send all sit here while recording. The bars give up their
+     spacing rather than their count, so the row stays whole. */
+  .waveform { gap: 3px; }
+}
+/* Narrower than that and the row would clip its right-hand end behind those
+   three controls — which is the live end, the part being spoken right now. The
+   oldest ten bars stand down instead, so what is left is a whole meter rather
+   than a sliced one. */
+@media (max-width: 359px) { .waveform i:nth-child(-n+10) { display: none; } }
+/* Short landscape windows keep a smaller stage too; input focus on portrait
+   phones does not change either the header or stage geometry. */
+@media (max-height: 620px) and (min-width: 641px) {
+  .room-header { min-height: 60px; padding-top: 8px; }
+  .stage-wrap { padding: 0 28px 6px; }.agent-stage { padding: 2px 0; }
+  .agent-orbit { width: 44px; height: 44px; margin-bottom: 2px; }
+  .agent-caption { height: 14px; margin-top: 0; }
+}
+@media (max-height: 620px) { .composer-hint { display: none; } }
+@media (max-height: 500px) and (pointer: coarse) {
+  .room-page { padding: 0; }
+  .room-shell { width: 100%; border: 0; border-radius: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); }
+  .composer-wrap { padding-bottom: max(8px, calc(var(--room-safe-bottom) - var(--room-keyboard-inset, 0px))); }
+  .composer textarea { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+html[data-paused="true"] *, html[data-paused="true"] *::before, html[data-paused="true"] *::after { animation-play-state: paused !important; }
+.agent-sphere { transition: scale 650ms cubic-bezier(.22, 1, .36, 1); }
+.perf-toggle { top: max(90px, calc(var(--room-viewport-height, 100dvh) - var(--room-composer-height, 90px) - 60px)); bottom: auto; right: max(18px, env(safe-area-inset-right)); }
+.perf-panel { max-height: calc(var(--room-viewport-height, 100dvh) - 36px); top: 18px; bottom: auto; }
+.perf-panel button { min-width: 44px; min-height: 44px; display: grid; place-items: center; }
+.room-conversation > button { min-width: 44px; min-height: 44px; }
+
+html[data-room-standalone="true"] .composer-wrap { padding-bottom: max(8px, calc(var(--room-safe-bottom) - var(--room-keyboard-inset, 0px))); }
+.room-dialog { position: fixed; inset: auto; top: calc(var(--room-viewport-top, 0px) + var(--room-viewport-height, 100dvh) / 2); left: 50%; transform: translate(-50%, -50%); margin: 0; width: min(380px, calc(100vw - 32px)); max-height: calc(var(--room-viewport-height, 100dvh) - 32px); overflow-y: auto; overscroll-behavior: contain; padding: 32px 24px 16px; border: 1px solid #ffffff1a; border-radius: 24px; background: #202129; color: #eeedf3; text-align: center; box-shadow: 0 24px 80px #0006; }
+.room-dialog::backdrop { background: #090a10b8; }
+.room-dialog .dialog-close { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; }
+.room-dialog h2 { font-size: 18px; font-weight: 500; letter-spacing: -.4px; }
+.room-dialog form { text-align: left; }
+.room-dialog label { display: block; margin-bottom: 8px; font-size: 13px; }
+.room-dialog input { display: block; width: 100%; min-height: 48px; border: 1px solid #ffffff35; border-radius: 12px; padding: 10px 12px; font-size: 16px; background: #17181f; color: #eeedf3; }
+.room-dialog input:focus-visible { outline: none; border-color: #c3a8e5; box-shadow: 0 0 0 3px #b6a2d826; }
+.room-dialog p { font-size: 12px; line-height: 1.5; color: #bcb5c9; margin-top: 10px; }
+.room-dialog .confirm-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 20px; border-radius: 12px; padding: 10px 16px; font-size: 14px; }
+.room-dialog .dialog-quiet { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 48px; margin-top: 8px; color: #c3b9d5; font-size: 13px; }
+.room-dialog .dialog-quiet:hover { color: #efe7fb; }
+.room-dialog button:disabled { opacity: .55; }
+/* The question asked before three agents forget a conversation: the sentence
+   under the heading is the whole dialog. The ending action is the quiet one on
+   purpose — see the component. */
+.clear-room { padding-bottom: 22px; }
+.clear-room h2 { font-size: 21px; letter-spacing: -.6px; }
+.clear-room .clear-what { margin: 10px 0 22px; font-size: 13px; line-height: 1.6; }
+.clear-room .confirm-button { margin-top: 4px; }
+.clear-confirm { font-size: 12px; }
+/* The first question the room asks: its own door. */
+.name-gate { padding-bottom: 22px; }
+.name-gate h2 { font-size: 21px; letter-spacing: -.6px; }
+.name-gate .gate-why { margin: 10px 0 22px; font-size: 13px; line-height: 1.6; }
+.name-gate .confirm-button { margin-top: 16px; }
+
