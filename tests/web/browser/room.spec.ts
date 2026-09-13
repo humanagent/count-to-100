@@ -210,7 +210,7 @@ test("reduced motion and a compact viewport keep the composer accessible", async
   await mockRoom(page)
   await page.goto("/")
   await expect(page.getByRole("region", { name: "The room", exact: true })).toHaveAttribute("aria-busy", "false")
-  expect(await page.locator(".orb-cloud").first().evaluate((node) => getComputedStyle(node).animationName)).toBe("none")
+  expect(await page.locator(".agent-sphere").first().evaluate((node) => getComputedStyle(node).animationName)).toBe("none")
   await page.setViewportSize({ width: 390, height: 420 })
   await expect(page.getByRole("textbox", { name: "Message the room" })).toBeInViewport()
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true)

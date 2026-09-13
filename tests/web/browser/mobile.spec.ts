@@ -12,6 +12,14 @@ async function openRoom(page: Page) {
   await expect(page.getByRole("region", { name: "The room", exact: true })).toHaveAttribute("aria-busy", "false")
 }
 
+/**
+ * The orbs are left out of every pixel comparison. They are drawn by a WebGL
+ * shader from a clock and a chunk that arrives after the page, so two runs of
+ * the same build do not paint the same pixels there; everything around them
+ * does, and that is what these baselines guard.
+ */
+const stable = (page: Page) => ({ mask: [page.locator(".agent-sphere")] })
+
 async function showLatest(page: Page) {
   const scroller = page.locator(".room-conversation > div").first()
   // Draft/notice resizing changes the available scroll area. Establish one
@@ -57,7 +65,7 @@ test(`installed PWA consumes the safe area once at ${viewport.width}x${viewport.
   })
   await expect(page.locator("html")).toHaveAttribute("data-room-standalone", "true")
   await expect.poll(geometry).toEqual({ bottom: viewport.height, gap: 0, padding: 34 })
-  if (info.project.name === "visual") await expect(page).toHaveScreenshot(`pwa-safe-area-${viewport.width}.png`)
+  if (info.project.name === "visual") await expect(page).toHaveScreenshot(`pwa-safe-area-${viewport.width}.png`, stable(page))
   const input = page.getByRole("textbox", { name: "Message the room" })
   await input.focus()
   // Focus isn't a resize: no immediate 96px jump toward the top.
@@ -69,7 +77,7 @@ test(`installed PWA consumes the safe area once at ${viewport.width}x${viewport.
   await expect.poll(geometry).toEqual({ bottom: 360, gap: 0, padding: 8 })
   // A mocked visual viewport does not render an OS keyboard: capture only
   // the app's visible area, not the empty space reserved for that keyboard.
-  if (info.project.name === "visual") await expect(page).toHaveScreenshot(`pwa-keyboard-${viewport.width}.png`, { clip: { x: 0, y: 0, width: viewport.width, height: 360 } })
+  if (info.project.name === "visual") await expect(page).toHaveScreenshot(`pwa-keyboard-${viewport.width}.png`, { ...stable(page), clip: { x: 0, y: 0, width: viewport.width, height: 360 } })
   await input.blur()
   await page.evaluate((height) => {
     Object.defineProperty(visualViewport!, "height", { configurable: true, value: height })
@@ -102,7 +110,7 @@ for (const viewport of [
     }))
     for (const target of targets) { expect(target.width).toBeGreaterThanOrEqual(44); expect(target.height).toBeGreaterThanOrEqual(44) }
     await showLatest(page)
-    if (info.project.name === "visual") await expect(page).toHaveScreenshot(`conversation-${viewport.width}x${viewport.height}.png`)
+    if (info.project.name === "visual") await expect(page).toHaveScreenshot(`conversation-${viewport.width}x${viewport.height}.png`, stable(page))
     else await page.screenshot({ path: info.outputPath("conversation.png") })
   })
 }
@@ -129,7 +137,7 @@ test("keyboard-sized viewport keeps notices and a long draft reachable", async (
   await expect(page.getByRole("button", { name: "Send message", exact: true })).toBeInViewport({ ratio: 1 })
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true)
   await showLatest(page)
-  if (info.project.name === "visual") await expect(page).toHaveScreenshot("keyboard-offline.png")
+  if (info.project.name === "visual") await expect(page).toHaveScreenshot("keyboard-offline.png", stable(page))
   else await page.screenshot({ path: info.outputPath("keyboard-offline.png") })
   await page.setViewportSize({ width: 390, height: 844 })
   await expect(box).toHaveValue("A long draft.\n".repeat(20))
@@ -145,7 +153,7 @@ test("iOS installation instructions fit without shifting the composer offscreen"
   await expect(page.getByText("In Safari, tap Share, then “Add to Home Screen”.")).toBeVisible()
   await expect(page.getByRole("textbox", { name: "Message the room" })).toBeInViewport({ ratio: 1 })
   await showLatest(page)
-  if (info.project.name === "visual") await expect(page).toHaveScreenshot("install-help.png")
+  if (info.project.name === "visual") await expect(page).toHaveScreenshot("install-help.png", stable(page))
   else await page.screenshot({ path: info.outputPath("install-help.png") })
   await page.getByRole("button", { name: "Dismiss install instructions" }).click()
 })

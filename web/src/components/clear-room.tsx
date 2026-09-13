@@ -1,8 +1,8 @@
 "use client"
 
-import { useLayoutEffect, useRef } from "react"
 import { XIcon } from "lucide-react"
-import { cycleDialogFocus } from "@/lib/dialog-focus"
+import { Button } from "@/components/ui/button"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 /**
  * The one question worth interrupting somebody for.
@@ -19,29 +19,23 @@ import { cycleDialogFocus } from "@/lib/dialog-focus"
  * consequence written on it rather than implied by its colour.
  */
 export function ClearRoom({ clear, dismiss }: { clear: () => void; dismiss: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null)
-  const keep = useRef<HTMLButtonElement>(null)
-  useLayoutEffect(() => {
-    const element = dialog.current!
-    element.showModal()
-    keep.current?.focus({ preventScroll: true })
-    return () => element.close()
-  }, [])
-  return <dialog
-    ref={dialog}
-    className="room-dialog clear-room"
-    aria-labelledby="clear-room-title"
-    aria-describedby="clear-room-what"
-    onKeyDown={cycleDialogFocus}
-    onCancel={(event) => { event.preventDefault(); dismiss() }}
-  >
-    <button className="icon-button dialog-close" aria-label="Close" onClick={dismiss}><XIcon size={18} /></button>
-    <h2 id="clear-room-title">Clear the room?</h2>
-    <p id="clear-room-what" className="clear-what">
-      Every line goes, for everyone here, and all three agents forget the conversation.
-      They keep who they are; your name stays.
-    </p>
-    <button ref={keep} className="confirm-button" onClick={() => { dialog.current?.close(); dismiss() }}>Keep the conversation</button>
-    <button className="dialog-quiet clear-confirm" onClick={() => { dialog.current?.close(); clear() }}>Clear it. This cannot be undone.</button>
-  </dialog>
+  return (
+    <Dialog open onOpenChange={(open) => { if (!open) dismiss() }}>
+      <DialogContent className="room-dialog" showCloseButton={false} onOpenAutoFocus={(event) => {
+        event.preventDefault()
+        ;(event.currentTarget as HTMLElement).querySelector<HTMLElement>("[data-keep]")?.focus({ preventScroll: true })
+      }}>
+        <DialogClose asChild><Button variant="ghost" size="icon" className="dialog-close" aria-label="Close"><XIcon /></Button></DialogClose>
+        <DialogHeader className="items-center text-center">
+          <DialogTitle className="text-[21px] font-medium tracking-[-.6px]">Clear the room?</DialogTitle>
+          <DialogDescription className="text-[13px] leading-relaxed">
+            Every line goes, for everyone here, and all three agents forget the conversation.
+            They keep who they are; your name stays.
+          </DialogDescription>
+        </DialogHeader>
+        <Button data-keep size="lg" className="h-12 w-full rounded-xl" onClick={dismiss}>Keep the conversation</Button>
+        <Button variant="ghost" className="text-muted-foreground h-12 w-full text-xs" onClick={clear}>Clear it. This cannot be undone.</Button>
+      </DialogContent>
+    </Dialog>
+  )
 }

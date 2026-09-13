@@ -13,6 +13,19 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // The orb is ElevenLabs UI's, vendored as the registry ships it: a Three.js
+  // scene that drives shader uniforms from a frame loop, which the React
+  // Compiler's rules read as mutation during render. Kept as upstream wrote
+  // it, so the next registry update is a copy and not a merge.
+  {
+    files: ["src/components/ui/orb.tsx"],
+    rules: {
+      "react-hooks/purity": "off",
+      "react-hooks/immutability": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/preserve-manual-memoization": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

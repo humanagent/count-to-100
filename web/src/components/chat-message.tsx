@@ -2,7 +2,8 @@
 
 import { memo, useEffect, useState } from "react"
 import { CheckIcon, CopyIcon, CornerUpLeftIcon, Volume2Icon } from "lucide-react"
-import { SoftOrb } from "@/components/soft-orb"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { colorsFor } from "@/lib/agent-colors"
 import { Response } from "@/components/ui/response"
 import { upTo, type Position } from "@/lib/speaking"
 import { visualLoop } from "@/lib/visual-motion"
@@ -34,6 +35,23 @@ function Reading({ text, live, where, speaker }: { text: string; live: boolean; 
 }
 
 /**
+ * The agent beside its line: the library's `Avatar`, in the agent's colours.
+ *
+ * Not the orb. The stage already has one WebGL canvas per agent, and a
+ * transcript is a list that grows; a canvas per line would run into the
+ * browser's ceiling on contexts a few dozen messages in. A still gradient in
+ * the same palette says whose line it is, which is all it is here for.
+ */
+function AgentAvatar({ name }: { name: string }) {
+  const [light, color, deep] = colorsFor(name)
+  return (
+    <Avatar className="message-avatar" aria-hidden="true">
+      <AvatarFallback className="text-transparent" style={{ background: `radial-gradient(circle at 30% 22%, ${light}, ${color} 28%, ${deep} 70%)` }}>{name.slice(0, 2)}</AvatarFallback>
+    </Avatar>
+  )
+}
+
+/**
  * `mine` and `agent` are told to the message, not guessed from the speaker.
  *
  * A line used to be the reader's when its speaker was the literal `you`. Once
@@ -57,7 +75,7 @@ export const ChatMessage = memo(function ChatMessage({ line, mine, agent, live, 
   const who = mine ? "You" : line.speaker
   return (
     <article className={`chat-message ${mine ? "from-you" : "from-agent"} ${line.animate ? "message-enter" : ""}`} aria-label={`${who} said`}>
-      {agent && <SoftOrb name={line.speaker} still className="message-avatar" />}
+      {agent && <AgentAvatar name={line.speaker} />}
       <div className="message-body">
         <div className="message-meta"><span>{who}</span>{agent && line.spoken && <span className="spoken-label"><Volume2Icon size={11} />{live ? "Speaking" : "Voice"}</span>}</div>
         <div className="message-bubble" data-speaking={live}>

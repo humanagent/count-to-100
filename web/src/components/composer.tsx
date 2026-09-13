@@ -2,6 +2,8 @@
 
 import { useImperativeHandle, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react"
 import { ArrowUpIcon, LoaderCircleIcon, MicIcon, SquareIcon, XIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 import { expectMicrophone } from "@/lib/audio-session"
 import { useDictation } from "@/hooks/use-dictation"
 import { Waveform } from "@/components/waveform"
@@ -126,7 +128,7 @@ export function Composer({ ready, online, busy, speech, submit, stop, handle, re
                   now, the header is already saying the long version of the same
                   thing, and a status that wraps moves the whole composer. */}
               {dictation.status === "listening"
-                ? <Waveform levels={dictation.levels} gate={dictation.gate} />
+                ? <Waveform levels={dictation.levels} gate={dictation.gate} heardAt={dictation.heardAt} />
                 : <p className="recording-note">{dictation.status === "connecting" ? "Connecting…" : "Finishing…"}</p>}
               {/* The words are no longer on screen while they are still being
                   guessed — a sentence rewriting itself is impossible to talk
@@ -134,22 +136,22 @@ export function Composer({ ready, online, busy, speech, submit, stop, handle, re
                   rather than by sight, to whom a waveform says nothing. */}
               <p className="sr-only" role="region" aria-label="Live transcription">{dictation.text || (dictation.status === "connecting" ? "Connecting microphone…" : "Listening…")}</p>
             </div>
-            <button type="button" className="icon-button" onClick={discard} aria-label="Discard recording" title="Throw the recording away"><XIcon size={18} /></button>
+            <Button type="button" variant="ghost" size="icon" className="composer-icon" onClick={discard} aria-label="Discard recording" title="Throw the recording away"><XIcon size={18} /></Button>
             {/* The middle of three, and the one that was missing: it ends the
                 recording and puts the words in the field instead of in front of
                 the agents, so a sentence can be read before it is spent. */}
-            <button type="button" className="icon-button" onClick={() => finish(true)} disabled={dictation.status !== "listening"} aria-label={finishing && endedBy === "review" ? "Finishing transcription" : "Stop and review"} title="Stop without sending">{finishing && endedBy === "review" ? spinner : <SquareIcon size={15} />}</button>
-            <button type="button" className="send-button" onClick={() => finish(false)} disabled={dictation.status !== "listening"} aria-label={finishing && endedBy === "send" ? "Finishing transcription" : "Send recording"}>{finishing && endedBy === "send" ? spinner : <ArrowUpIcon size={20} />}</button>
+            <Button type="button" variant="ghost" size="icon" className="composer-icon" onClick={() => finish(true)} disabled={dictation.status !== "listening"} aria-label={finishing && endedBy === "review" ? "Finishing transcription" : "Stop and review"} title="Stop without sending">{finishing && endedBy === "review" ? spinner : <SquareIcon size={15} />}</Button>
+            <Button type="button" size="icon" className="composer-send" onClick={() => finish(false)} disabled={dictation.status !== "listening"} aria-label={finishing && endedBy === "send" ? "Finishing transcription" : "Send recording"}>{finishing && endedBy === "send" ? spinner : <ArrowUpIcon size={20} />}</Button>
           </>
         ) : (
           <>
-            <textarea ref={box} {...keyboardFocus} aria-label="Message the room" rows={1} maxLength={PROMPT_LIMIT} disabled={!interactive} value={draft} onChange={(event) => change(event.target.value)} placeholder={interactive ? placeholder : "Loading…"} onKeyDown={(event) => {
+            <Textarea ref={box} {...keyboardFocus} className="composer-field" aria-label="Message the room" rows={1} maxLength={PROMPT_LIMIT} disabled={!interactive} value={draft} onChange={(event) => change(event.target.value)} placeholder={interactive ? placeholder : "Loading…"} onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) { event.preventDefault(); send() }
             }} />
             <div className="composer-buttons">
-              {busy && <button type="button" className="icon-button" onClick={stop} aria-label="Stop the room" title="Stop the room"><SquareIcon size={15} /></button>}
-              <button type="button" className="icon-button" onClick={startRecording} disabled={!speech || !online || !ready} aria-label="Record a voice message" title={speech ? "Record a voice message" : "Voice is not configured"}><MicIcon size={19} /></button>
-              <button type="submit" className="send-button" disabled={!draft.trim() || !ready || !online} aria-label="Send message"><ArrowUpIcon size={20} /></button>
+              {busy && <Button type="button" variant="ghost" size="icon" className="composer-icon" onClick={stop} aria-label="Stop the room" title="Stop the room"><SquareIcon size={15} /></Button>}
+              <Button type="button" variant="ghost" size="icon" className="composer-icon" onClick={startRecording} disabled={!speech || !online || !ready} aria-label="Record a voice message" title={speech ? "Record a voice message" : "Voice is not configured"}><MicIcon size={19} /></Button>
+              <Button type="submit" size="icon" className="composer-send" disabled={!draft.trim() || !ready || !online} aria-label="Send message"><ArrowUpIcon size={20} /></Button>
             </div>
           </>
         )}

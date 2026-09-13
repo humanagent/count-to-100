@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { ArrowDownToLineIcon, EraserIcon, RefreshCwIcon, WifiOffIcon, XIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { ClearRoom } from "@/components/clear-room"
 import { NameGate } from "@/components/name-gate"
 import { RoomTitle } from "@/components/room-title"
@@ -308,8 +309,8 @@ export function Room({ names, speech }: { names: string[]; speech: boolean }) {
             {/* Destructive, shared, and irreversible, so it is never the thing
                 that happens on a mis-tap: the press opens the question, and
                 the question has the answer on it. */}
-            <button className="icon-button" onClick={() => setConfirmClear(true)} disabled={!chat || opening || busy || listening || !pwa.online} aria-label="Clear the room" title="Clear the room"><EraserIcon size={17} /></button>
-            {!pwa.installed && (pwa.canInstall || pwa.ios) && <button className="icon-button" onClick={() => pwa.canInstall ? void pwa.install() : setInstallHelp(true)} aria-label="Install the room" title="Install the room"><ArrowDownToLineIcon size={18} /></button>}
+            <Button variant="ghost" size="icon" className="room-icon" onClick={() => setConfirmClear(true)} disabled={!chat || opening || busy || listening || !pwa.online} aria-label="Clear the room" title="Clear the room"><EraserIcon size={17} /></Button>
+            {!pwa.installed && (pwa.canInstall || pwa.ios) && <Button variant="ghost" size="icon" className="room-icon" onClick={() => pwa.canInstall ? void pwa.install() : setInstallHelp(true)} aria-label="Install the room" title="Install the room"><ArrowDownToLineIcon size={18} /></Button>}
           </nav>
         </header>
         <div className="stage-wrap"><Stage names={names} phase={phase} level={level} /></div>

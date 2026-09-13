@@ -75,6 +75,7 @@ export function useDictation({ completed, failed, statusChanged }: {
   // times a second and none of it is worth a re-render.
   const levels = useCallback(() => controller.current?.levels() ?? EMPTY, [])
   const gate = useCallback(() => controller.current?.gate() ?? 0, [])
+  const heardAt = useCallback(() => controller.current?.heardAt() ?? 0, [])
 
-  return { ...state, levels, gate, start: () => void controller.current?.start(), finish: () => controller.current?.finish(), cancel: () => controller.current?.cancel() }
+  return { ...state, levels, gate, heardAt, start: () => void controller.current?.start(), finish: () => controller.current?.finish(), cancel: () => controller.current?.cancel() }
 }

@@ -41,12 +41,18 @@ test("modal entrance never shifts the room, and reduced motion removes it", asyn
   }
   const dialog = page.getByRole("dialog", { name: "Clear the room?" })
   await expect(dialog.getByRole("button", { name: "Keep the conversation" })).toBeFocused()
+  // The library's Dialog enters with tw-animate's `enter` keyframes on the
+  // content and on its overlay, which is a sibling element rather than a
+  // ::backdrop. Short, and gone entirely under reduced motion.
+  const overlay = page.locator("[data-slot=dialog-overlay]")
   expect(await dialog.evaluate((node) => {
     const style = getComputedStyle(node)
-    return { name: style.animationName, duration: style.animationDuration, fill: style.animationFillMode, backdrop: getComputedStyle(node, "::backdrop").animationName }
-  })).toEqual({ name: "dialog-appear", duration: "0.18s", fill: "none", backdrop: "surface-appear" })
+    return { name: style.animationName, duration: style.animationDuration }
+  })).toEqual({ name: "enter", duration: "0.2s" })
+  await expect(overlay).toHaveCSS("animation-name", "enter")
   await page.emulateMedia({ reducedMotion: "reduce" })
   await expect(dialog).toHaveCSS("animation-name", "none")
+  await expect(overlay).toHaveCSS("animation-name", "none")
   await dialog.getByRole("button", { name: "Close", exact: true }).click()
   await expect(dialog).toHaveCount(0)
   await start.click()
@@ -87,35 +93,37 @@ test("changing motion or visibility during speech rests only the visuals", async
   await page.getByRole("button", { name: "Send message", exact: true }).click()
   const message = page.getByRole("article", { name: "Steve said" })
   const ahead = message.locator(".reading-ahead")
-  const orb = page.locator('.agent[data-phase="speaking"] .agent-sphere > div')
-  const inlineTransform = () => orb.evaluate((node) => (node as HTMLElement).style.transform)
+  // The orbs are drawn by a WebGL canvas with its own scheduler; the one thing
+  // the room can observe about it is the switch the stage feeds it.
+  const stage = page.locator(".agent-stage")
+  const motion = () => stage.getAttribute("data-motion")
   const voiceState = () => page.evaluate(() => (window as typeof window & { visualTestVoice: { starts: number; stops: number } }).visualTestVoice)
   await expect(message.getByText("Speaking", { exact: true })).toBeVisible()
   await expect(ahead).not.toHaveText("")
-  await expect.poll(inlineTransform).toMatch(/^scale\(1\./)
+  await expect.poll(motion).toBe("true")
 
   await page.emulateMedia({ reducedMotion: "reduce" })
   await expect(ahead).toHaveText("")
-  await expect.poll(inlineTransform).toBe("")
+  await expect.poll(motion).toBe("false")
   expect(await voiceState()).toEqual({ starts: 1, stops: 0 })
   await expect(message.locator(".message-bubble")).toHaveText(reply)
 
   await page.emulateMedia({ reducedMotion: "no-preference" })
   await expect(ahead).not.toHaveText("")
-  await expect.poll(inlineTransform).toMatch(/^scale\(1\./)
+  await expect.poll(motion).toBe("true")
   await page.evaluate(() => {
     Object.defineProperty(document, "hidden", { configurable: true, value: true })
     document.dispatchEvent(new Event("visibilitychange"))
   })
   await expect(ahead).toHaveText("")
-  await expect.poll(inlineTransform).toBe("")
+  await expect.poll(motion).toBe("false")
   expect(await voiceState()).toEqual({ starts: 1, stops: 0 })
   await page.evaluate(() => {
     Reflect.deleteProperty(document, "hidden")
     document.dispatchEvent(new Event("visibilitychange"))
   })
   await expect(ahead).not.toHaveText("")
-  await expect.poll(inlineTransform).toMatch(/^scale\(1\./)
+  await expect.poll(motion).toBe("true")
   expect(await voiceState()).toEqual({ starts: 1, stops: 0 })
   await expect(message.getByText("Speaking", { exact: true })).toBeVisible()
 })

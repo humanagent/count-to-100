@@ -60,6 +60,9 @@ export class Dictation {
   private partial = ""
   /** Recent loudness, oldest first. Presentation only; never a word of content. */
   private meter: number[] = []
+  /** When the newest readings landed, for a meter that plays them out rather
+   *  than jumping to them. */
+  private heard = 0
   private started = 0
   private ready = false
   private audioStarted = false
@@ -101,6 +104,20 @@ export class Dictation {
   }
 
   /**
+   * When the last chunk was measured, on `performance.now()`'s clock.
+   *
+   * The SDK hands over a quarter of a second of audio at a time, so `levels`
+   * grows by sixteen readings at once, four times a second. A meter that
+   * draws the newest reading the moment it has it moves in four jumps a
+   * second and looks a beat behind the voice. Knowing when the jump happened
+   * lets it spread those sixteen readings over the quarter second until the
+   * next ones — the same delay, but a motion instead of a step.
+   */
+  heardAt(): number {
+    return this.heard
+  }
+
+  /**
    * RMS per window of PCM16, straight off the wire, and the loudest of them.
    *
    * Wrapped in its own try: a meter is decoration, and decoration must never
@@ -131,6 +148,7 @@ export class Dictation {
         this.meter.push(level)
       }
       if (this.meter.length > METER_LENGTH) this.meter.splice(0, this.meter.length - METER_LENGTH)
+      this.heard = performance.now()
     } catch {
       // Decoration never costs a word — and neither does the gate: a moment
       // nobody could measure goes to the transcriber rather than being called
