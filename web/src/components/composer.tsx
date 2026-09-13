@@ -126,7 +126,7 @@ export function Composer({ ready, online, busy, speech, submit, stop, handle, re
                   now, the header is already saying the long version of the same
                   thing, and a status that wraps moves the whole composer. */}
               {dictation.status === "listening"
-                ? <Waveform levels={dictation.levels} gate={dictation.gate} />
+                ? <Waveform levels={dictation.levels} gate={dictation.gate} heardAt={dictation.heardAt} />
                 : <p className="recording-note">{dictation.status === "connecting" ? "Connecting…" : "Finishing…"}</p>}
               {/* The words are no longer on screen while they are still being
                   guessed — a sentence rewriting itself is impossible to talk

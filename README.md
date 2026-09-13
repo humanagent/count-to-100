@@ -1,7 +1,7 @@
 # Teaching agents to shut up
 
 <p align="center">
-  <img src="docs/the-room.png" alt="The room: Steve, Jordan and Pepe, all listening, and one spoken reply from Steve" width="620">
+  <img src="docs/the-room.png" alt="Fabri’s room: Steve, Jordan and Pepe, all listening" width="620">
 </p>
 
 **The room**, live: [voice-group-chat.up.railway.app](https://voice-group-chat.up.railway.app).

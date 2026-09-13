@@ -9,6 +9,10 @@ import { visualLoop } from "@/lib/visual-motion"
 const BARS = 24
 const FLOOR = 2
 const CEILING = 24
+/** The SDK's chunk, in the meter's readings and in time: 4096 samples at
+ *  16kHz, measured 256 samples at a time. Sixteen readings every quarter second. */
+const CHUNK_READINGS = 16
+const CHUNK_MS = 256
 
 /**
  * What the microphone is hearing, and nothing else.
@@ -29,8 +33,15 @@ const CEILING = 24
  * round caps into ellipses on the way up. The row is also written straight to
  * the DOM on each frame rather than through state, because sixty re-renders a
  * second to move a few pixels is a cost with nothing to show for it.
+ *
+ * Played out, not snapped to. The readings arrive a quarter of a second at a
+ * time, and a row that showed the newest one the instant it landed moved in
+ * four lurches a second — which reads as slow, not as live. Instead the row
+ * lags the newest reading by up to one chunk and closes that gap one reading
+ * per sixteen milliseconds, so between deliveries the bars keep walking at the
+ * rate the voice was measured. Same delay as before; now it is a motion.
  */
-export function Waveform({ levels, gate }: { levels: () => readonly number[]; gate?: () => number }) {
+export function Waveform({ levels, gate, heardAt }: { levels: () => readonly number[]; gate?: () => number; heardAt?: () => number }) {
   const row = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -40,9 +51,14 @@ export function Waveform({ levels, gate }: { levels: () => readonly number[]; ga
       bar.style.opacity = sent[i] === false ? "0.3" : "1"
     })
     const flat = () => paint(bars.map(() => FLOOR))
-    return visualLoop(() => {
+    return visualLoop((time) => {
       const recent = levels()
-      const tail = recent.slice(-BARS)
+      // How much of the newest chunk has been "played": all of it when there
+      // is no clock to play against, or once the next one is due.
+      const since = heardAt ? time - heardAt() : Infinity
+      const played = Math.min(CHUNK_READINGS, Math.floor(since / (CHUNK_MS / CHUNK_READINGS)))
+      const lag = Math.min(CHUNK_READINGS - played, Math.max(0, recent.length - BARS))
+      const tail = recent.slice(0, recent.length - lag).slice(-BARS)
       const level = gate?.() ?? 0
       const sent = bars.map((_, i) => {
         const value = tail[i - (BARS - tail.length)] ?? 0
@@ -56,7 +72,7 @@ export function Waveform({ levels, gate }: { levels: () => readonly number[]; ga
         return Math.round(FLOOR + scaled * (CEILING - FLOOR))
       }), sent)
     }, flat)
-  }, [levels, gate])
+  }, [levels, gate, heardAt])
 
   return (
     <div className="waveform" ref={row} aria-hidden="true">
