@@ -47,6 +47,23 @@ test("chat, multiline drafts, IME, and real performance samples", async ({ page 
   expect(errors).toEqual([])
 })
 
+test("a counted number is on the screen, not turned into a list marker", async ({ page }) => {
+  // Observed: "95. Jordan, you’re next." showed as "Jordan, you’re next." and
+  // "100." as a blank bubble — the renderer had read each as an ordered list.
+  await mockRoom(page, [
+    { speaker: "Steve", text: "95. Jordan, you’re next.", spoken: true },
+    { speaker: "Pepe", text: "100.", spoken: true },
+    { speaker: "Jordan", text: "1. wake up\n2. count to a hundred", spoken: false },
+  ])
+  await page.goto("/")
+  await expect(page.getByRole("region", { name: "The room", exact: true })).toHaveAttribute("aria-busy", "false")
+  const bubbles = page.locator(".message-bubble")
+  await expect(bubbles.nth(0)).toHaveText("95. Jordan, you’re next.")
+  await expect(bubbles.nth(1)).toHaveText("100.")
+  await expect(bubbles.locator("ol")).toHaveCount(1)
+  await expect(bubbles.nth(2).locator("li")).toHaveCount(2)
+})
+
 test("clearing the room asks first, then forgets it everywhere", async ({ page }) => {
   const kept = [{ speaker: "Fabri", text: "a name from an older sitting", spoken: false }]
   await mockRoom(page, kept)
@@ -94,11 +111,25 @@ test("clearing the room asks first, then forgets it everywhere", async ({ page }
   await expect(old).toBeVisible()
   expect(cleared).toBe(1)
 
+  // The screen empties on the answer, not on the server: the delete is held
+  // until the page is told to let it through, and the room is already blank.
   busy = false
+  let letThrough: () => void = () => {}
+  const held = new Promise<void>((resolve) => { letThrough = resolve })
+  await page.route("**/api/room", async (route) => {
+    if (route.request().method() !== "DELETE") return route.fallback()
+    cleared++
+    await held
+    await page.route("**/api/history?*", (again) => again.fulfill({ json: { lines: [] } }))
+    return route.fulfill({ json: { chat: "room", agents: 3, complete: true } })
+  })
   await eraser.click()
   await ask.getByRole("button", { name: /Clear it/ }).click()
-  await expect(old).toHaveCount(0)
   await expect(page.locator(".chat-message")).toHaveCount(0)
+  await expect(page.getByRole("region", { name: "The room", exact: true })).toHaveAttribute("aria-busy", "true")
+  letThrough()
+  await expect(page.getByRole("region", { name: "The room", exact: true })).toHaveAttribute("aria-busy", "false")
+  await expect(old).toHaveCount(0)
   expect(cleared).toBe(2)
   // The room is open again, not left disconnected, and the name is still ours.
   await expect(page.getByRole("heading", { name: "Tester’s room", exact: true })).toBeVisible()

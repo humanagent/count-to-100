@@ -276,27 +276,31 @@ export function Room({ names, speech }: { names: string[]; speech: boolean }) {
    * so what comes back is the room as it is on a first visit rather than a
    * half-deleted one. Everything that is not the conversation — the name, the
    * draft — is untouched.
+   *
+   * The screen empties the moment the question is answered. The server takes
+   * seconds over it — waiting for a round to let go, forgetting three
+   * sessions, briefing three agents again — and a conversation that stays on
+   * screen through all of that reads as a clear that did not take. The order
+   * the room is emptied in is the browser first and the agents after; when
+   * the agents refuse, the transcript is reloaded from them, so what is shown
+   * is what they still hold rather than what was hoped.
    */
   async function clearRoom() {
     setConfirmClear(false)
     hush()
+    setLines([])
+    setPhase({})
     setOpening(true)
     setError(null)
     try {
       const response = await fetch("/api/room", { method: "DELETE" })
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}))
-        setError(data.error || "The room couldn’t be cleared. Try again in a moment.")
-        setOpening(false)
-        return
-      }
-      setLines([])
-      setPhase({})
-      await open()
+      if (response.ok) { setOpening(false); return }
+      const data = await response.json().catch(() => ({}))
+      setError(data.error || "The room couldn’t be cleared. Try again in a moment.")
     } catch {
       setError("The room couldn’t be cleared. Check your connection and try again.")
-      setOpening(false)
     }
+    await open()
   }
 
   return (

@@ -1,6 +1,6 @@
 import { agents } from "@/lib/agents"
 import { forget, ROOM } from "@/lib/group"
-import { acquireRoom } from "@/lib/room-round"
+import { acquireRoom, awaitRoom } from "@/lib/room-round"
 import { ensureRoom } from "@/lib/room-session"
 
 export const dynamic = "force-dynamic"
@@ -19,10 +19,19 @@ export async function GET() {
   finally { release?.() }
 }
 
-/** Explicit clearing is for API clients, never navigation or counting. */
+/**
+ * Explicit clearing is for API clients, never navigation or counting.
+ *
+ * The browser stops its round and asks for this in the same gesture, and the
+ * round gives the room back a moment after the connection drops — so the clear
+ * waits for it rather than refusing the eraser to whoever pressed it while an
+ * agent was still talking. A room that stays busy past that is somebody
+ * else's round, and gets the refusal.
+ */
+const CLEAR_PATIENCE_MS = 15_000
 export async function DELETE() {
   const group = agents()
-  const release = acquireRoom()
+  const release = await awaitRoom(CLEAR_PATIENCE_MS)
   if (!release) return Response.json({ error: "The room is responding. Wait before clearing it." }, { status: 409 })
   try {
     const gone = await forget(group, ROOM)

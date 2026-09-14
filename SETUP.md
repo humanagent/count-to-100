@@ -247,7 +247,7 @@ at once.
 
 ## Tests
 
-241 Python tests and 34 in the browser client, six of which run against a live
+242 Python tests and 32 in the browser client, six of which run against a live
 gateway. The six exist because
 every bug this layer has had got past the units: the flag that swallowed real
 replies, the preamble that broke the prompt cache, the vocative without a comma.
@@ -422,10 +422,6 @@ docker run -p 3000:3000 -v hermes-data:/data \
   -e OPENROUTER_API_KEY=... -e ELEVENLABS_API_KEY=... -e SPEAK_REPLIES=1 \
   hermes-elevenlabs
 ```
-
-On Railway that is the same thing with a volume mounted at `/data` and those
-three as service variables. `railway.json` pins the Dockerfile builder, because
-autodetection picks one runtime and this repo is Python and Node at once.
 
 ### What has to survive a deploy
 

@@ -14,6 +14,27 @@ export function acquireRoom(): (() => void) | null {
   return () => { if (state.__roomRound === token) delete state.__roomRound }
 }
 
+/**
+ * The room, once whoever holds it lets go — or null when nobody does in time.
+ *
+ * Clearing the room stops the round first, but the two arrive at the server
+ * as separate things: the browser drops the round's connection and, in the
+ * same breath, asks for the delete. The round only releases the room after
+ * its own calls to the agents notice the drop and settle, so a clear that
+ * asked for the room and gave up at once lost that race nearly every time an
+ * agent was mid-sentence — which, in a room that counts to a hundred, is most
+ * of the time. Waiting a little is the difference between "stop and clear"
+ * and "try again when it finishes".
+ */
+export async function awaitRoom(patienceMs: number, every = 100): Promise<(() => void) | null> {
+  const deadline = Date.now() + patienceMs
+  for (;;) {
+    const release = acquireRoom()
+    if (release || Date.now() >= deadline) return release
+    await new Promise((resolve) => setTimeout(resolve, every))
+  }
+}
+
 /** One prompt, then whatever the agents say back to each other, until quiet. */
 export async function runRoomRound({ group, message, speaker = UNNAMED, signal, emit }: {
   group: Agent[]; message: string; speaker?: string; signal: AbortSignal; emit: (event: RoomEvent) => void;
