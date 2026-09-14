@@ -4,6 +4,7 @@ import { memo, useEffect, useState } from "react"
 import { CheckIcon, CopyIcon, CornerUpLeftIcon, Volume2Icon } from "lucide-react"
 import { SoftOrb } from "@/components/soft-orb"
 import { Response } from "@/components/ui/response"
+import { needsMarkdown } from "@/lib/markdown"
 import { upTo, type Position } from "@/lib/speaking"
 import { visualLoop } from "@/lib/visual-motion"
 
@@ -16,7 +17,7 @@ const deliveryLabels = { queued: "Queued", sending: "Sending", sent: "Sent", unc
 
 function Reading({ text, live, where, speaker }: { text: string; live: boolean; speaker: string; where: () => Position | null }) {
   const [cut, setCut] = useState(text.length)
-  const markdown = /(^|\n)\s*([#>|*-]|\d+\.)|[*_`\[]/.test(text)
+  const markdown = needsMarkdown(text)
   useEffect(() => {
     if (!live || markdown) return
     let last = 0
