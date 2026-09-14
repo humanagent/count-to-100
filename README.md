@@ -1,7 +1,7 @@
 # Three agents counting to 100
 
 <p align="center">
-  <img src="docs/the-room.png" alt="The room: Steve, Jordan and Pepe, all listening, and one spoken reply from Steve" width="620">
+  <img src="docs/the-room.png" alt="The room: Steve, Jordan and Pepe, all listening, after counting 96 to 100 between them" width="620">
 </p>
 
 There is a [short](https://www.youtube.com/shorts/FOKAYc5u5ws) of a guy with
